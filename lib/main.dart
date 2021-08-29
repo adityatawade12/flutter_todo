@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:todo_app/models/task.dart';
+import 'package:todo_app/widgets/newTaskModal.dart';
 import 'package:todo_app/widgets/taskList.dart';
 
 void main() {
@@ -29,23 +31,56 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  final List<Task> tasks = [
+    // Task(
+    //     taskName: "Clean Shelf asd asd asds ad asdsd asdsa asdsa asds ",
+    //     id: "1",
+    //     date: DateTime.now(),
+    //     time: TimeOfDay.now()),
+    // Task(
+    //     taskName: "Buy Table",
+    //     id: "2",
+    //     date: DateTime.now(),
+    //     time: TimeOfDay.now()),
+  ];
 
-  void _incrementCounter() {
+  void _addTask(task, date, time) {
+    var newtask = Task(
+        taskName: task, id: DateTime.now().toString(), date: date, time: time);
     setState(() {
-      _counter++;
+      tasks.add(newtask);
+      Navigator.of(context).pop();
     });
+  }
+
+  void _deleteTask(id) {
+    setState(() {
+      tasks.removeWhere((task) => task.id == id);
+    });
+  }
+
+  void _showModal(BuildContext ctx) {
+    showModalBottomSheet(
+        context: ctx,
+        builder: (builder) {
+          return GestureDetector(
+            child: TaskModal(_addTask),
+            onTap: () {},
+            behavior: HitTestBehavior.opaque,
+          );
+        });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: TaskList(),
+      body: TaskList(tasks, _deleteTask),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: () => _showModal(context),
         tooltip: 'Increment',
         child: Icon(Icons.add),
       ),
